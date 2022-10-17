@@ -7,16 +7,39 @@ using namespace std;
 DWORD WINAPI ThreadSaid(LPVOID lpThreadParameter) {
 	
 	char str[26];
-	int liveTime = *static_cast<int*>(lpThreadParameter);
-	for(int i = 0 ;  i < liveTime; ++i)
+	time_t liveTime =(*static_cast<int*>(lpThreadParameter));
+	auto begin = std::chrono::system_clock::now();
+	time_t beginTime = std::chrono::system_clock::to_time_t(begin);
+	auto nowadays = begin;
+	time_t curTime = std::chrono::system_clock::to_time_t(nowadays);
+	time_t period = 5;
+	auto delta = 0;
+
+	while(true)
 	{
-		Sleep(5 * 1000);
-		auto nowadays = std::chrono::system_clock::now();
-		std::time_t cur_time = std::chrono::system_clock::to_time_t(nowadays);
-		ctime_s(str, sizeof str, &cur_time);
+		//cout << "\tdelta " << delta << endl;
+		delta = curTime - beginTime + period;
+		if (delta > liveTime) {
+			break;
+		}
+		Sleep(period * 1000);
+		nowadays = std::chrono::system_clock::now();
+		curTime = std::chrono::system_clock::to_time_t(nowadays);
+		ctime_s(str, sizeof str, &curTime);
 		cout << str << endl;
 	}
-	
+
+	while (true)
+	{
+		nowadays = std::chrono::system_clock::now();
+		curTime = std::chrono::system_clock::to_time_t(nowadays);
+		delta = curTime - beginTime;
+		//cout << "#";
+		if (delta >= liveTime) {
+			break;
+		}
+	}
+	cout << endl;
 	return 0;
 }
 
