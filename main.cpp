@@ -5,41 +5,31 @@
 using namespace std;
 
 DWORD WINAPI ThreadSaid(LPVOID lpThreadParameter) {
-	
 	char str[26];
 	time_t liveTime =(*static_cast<int*>(lpThreadParameter));
 	auto begin = std::chrono::system_clock::now();
 	time_t beginTime = std::chrono::system_clock::to_time_t(begin);
-	auto nowadays = begin;
-	time_t curTime = std::chrono::system_clock::to_time_t(nowadays);
-	time_t period = 5;
-	auto delta = 0;
+	time_t curTime = std::chrono::system_clock::to_time_t(begin);
+	const time_t period = 5;
+	time_t endTime = beginTime + liveTime;
 
-	while(true)
+	bool flag = true;
+	for  (time_t curTime = beginTime; curTime != endTime; )
 	{
-		//cout << "\tdelta " << delta << endl;
-		delta = curTime - beginTime + period;
-		if (delta > liveTime) {
-			break;
+		auto tmp = std::chrono::system_clock::now();
+		curTime = std::chrono::system_clock::to_time_t(tmp);
+		time_t spendTimeTillBegin = curTime - beginTime;
+		
+		if (flag && spendTimeTillBegin && spendTimeTillBegin % period == 0) {
+			ctime_s(str, sizeof str, &curTime);
+			std::cout << str << std::endl;
+			flag = false;
 		}
-		Sleep(period * 1000);
-		nowadays = std::chrono::system_clock::now();
-		curTime = std::chrono::system_clock::to_time_t(nowadays);
-		ctime_s(str, sizeof str, &curTime);
-		cout << str << endl;
-	}
-
-	while (true)
-	{
-		nowadays = std::chrono::system_clock::now();
-		curTime = std::chrono::system_clock::to_time_t(nowadays);
-		delta = curTime - beginTime;
-		//cout << "#";
-		if (delta >= liveTime) {
-			break;
+		else if (spendTimeTillBegin % period) {
+			flag = true;
 		}
 	}
-	cout << endl;
+
 	return 0;
 }
 
